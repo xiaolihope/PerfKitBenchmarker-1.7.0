@@ -134,12 +134,12 @@ class BaseResource(object):
     if not self.delete_start_time:
       self.delete_start_time = time.time()
     self._Delete()
-#    try:
-#      if self._Exists():
-#        raise errors.Resource.RetryableDeletionError(
-#            'Deletion of %s failed.' % type(self).__name__)
-#    except NotImplementedError:
-#      pass
+    try:
+      if self._Exists():
+        raise errors.Resource.RetryableDeletionError(
+            'Deletion of %s failed.' % type(self).__name__)
+    except NotImplementedError:
+      pass
     if not self.delete_end_time:
       self.delete_end_time = time.time()
 
