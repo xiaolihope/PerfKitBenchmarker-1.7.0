@@ -84,7 +84,7 @@ class OpenStackVirtualMachine(virtual_machine.BaseVirtualMachine):
   @property
   def group_id(self):
     """Returns the security group ID of this VM."""
-    return 'perfkit_sc_group'
+    return 'perfkit_sc_group_%s' % FLAGS.run_uri
 
   def _CreateDependencies(self):
     """Validate and Create dependencies prior creating the VM."""
@@ -146,8 +146,10 @@ class OpenStackVirtualMachine(virtual_machine.BaseVirtualMachine):
         return
       logging.info('Testing OpenStack CLI command is installed and working')
       cmd = os_utils.OpenStackCLICommand(self, 'image', 'list')
-      stdout, stderr, _ = cmd.Issue()
-      if stderr:
+      stdout, stderr, retcode = cmd.Issue()
+#      import ipdb;ipdb.set_trace()
+      if retcode:
+#      if stderr:
         raise errors.Config.InvalidValue(
             'OpenStack CLI test command failed. Please make sure the OpenStack '
             'CLI client is installed and properly configured')
@@ -227,8 +229,9 @@ class OpenStackVirtualMachine(virtual_machine.BaseVirtualMachine):
     """
     if err_msg is None:
       err_msg = ""
-    stdout, stderr, _ = cmd.Issue()
-    if stderr:
+    stdout, stderr, retcode = cmd.Issue()
+#    if stderr:
+    if  retcode:
       raise errors.Config.InvalidValue(err_msg)
     return stdout
 
@@ -261,8 +264,9 @@ class OpenStackVirtualMachine(virtual_machine.BaseVirtualMachine):
   def _CreateInstance(self):
     """Execute command for creating an OpenStack VM instance."""
     create_cmd = self._GetCreateCommand()
-    stdout, stderr, _ = create_cmd.Issue()
-    if stderr:
+    stdout, stderr, retcode = create_cmd.Issue()
+#    if stderr:
+    if  retcode:
       raise errors.Error(stderr)
     resp = json.loads(stdout)
     self.id = resp['id']
