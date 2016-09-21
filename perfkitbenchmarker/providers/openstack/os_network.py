@@ -133,8 +133,9 @@ class OpenStackFloatingIPPool(object):
       cmd = utils.OpenStackCLICommand(vm, OSC_IP_CMD, OSC_FLOATING_SUBCMD,
                                       'add', floating_ip['ip'], vm.id)
       del cmd.flags['format']  # Command does not support json output format
-      _, stderr, _ = cmd.Issue()
-      if stderr:
+      _, stderr, retcode = cmd.Issue()
+      #import ipdb;ipdb.set_trace()
+      if retcode:
         raise errors.Error(stderr)
       return floating_ip
 
