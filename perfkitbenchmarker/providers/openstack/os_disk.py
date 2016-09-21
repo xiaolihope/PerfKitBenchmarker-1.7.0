@@ -72,8 +72,8 @@ def DeleteVolume(resource, volume_id):
 def WaitForVolumeCreation(resource, volume_id):
   """Waits until volume is available"""
   vol_cmd = os_utils.OpenStackCLICommand(resource, 'volume', 'show', volume_id)
-  stdout, stderr, _ = vol_cmd.Issue()
-  if stderr:
+  stdout, stderr, retcode = vol_cmd.Issue()
+  if retcode:
     raise errors.Error(stderr)
   resp = json.loads(stdout)
   if resp['status'] != 'available':
@@ -132,8 +132,8 @@ class OpenStackDisk(disk.BaseDisk):
     cmd = os_utils.OpenStackCLICommand(
         self, 'server', 'add', 'volume', vm.id, self.id)
     del cmd.flags['format']
-    _, stderr, _ = cmd.Issue()
-    if stderr:
+    _, stderr, retcode = cmd.Issue()
+    if retcode:
       raise errors.Error(stderr)
 
   @vm_util.Retry(poll_interval=1, max_retries=-1, timeout=300, log_errors=False,
@@ -142,8 +142,8 @@ class OpenStackDisk(disk.BaseDisk):
     if self.id is None:
       return
     cmd = os_utils.OpenStackCLICommand(self, 'volume', 'show', self.id)
-    stdout, stderr, _ = cmd.Issue()
-    if stderr:
+    stdout, stderr, retcode = cmd.Issue()
+    if retcode:
       raise errors.Error(stderr)
     resp = json.loads(stdout)
     attachments = resp['attachments']
@@ -169,8 +169,8 @@ class OpenStackDisk(disk.BaseDisk):
     cmd = os_utils.OpenStackCLICommand(
         self, 'server', 'remove', 'volume', self.attached_vm_id, self.id)
     del cmd.flags['format']
-    _, stderr, _ = cmd.Issue()
-    if stderr:
+    _, stderr, retcode = cmd.Issue()
+    if retcode:
       raise errors.Error(stderr)
 
   @vm_util.Retry(poll_interval=1, max_retries=-1, timeout=300, log_errors=False,
@@ -179,8 +179,9 @@ class OpenStackDisk(disk.BaseDisk):
     if self.id is None:
       return
     cmd = os_utils.OpenStackCLICommand(self, 'volume', 'show', self.id)
-    stdout, stderr, _ = cmd.Issue(suppress_warning=True)
-    if stderr.strip():
+    stdout, stderr, retcode = cmd.Issue(suppress_warning=True)
+#    if stderr.strip():
+    if retcode:
       return  # Volume could not be found, inferred that has been deleted.
     resp = json.loads(stdout)
     if resp['status'] in ('building', 'available', 'in-use', 'deleting',):
