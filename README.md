@@ -23,4 +23,7 @@ export OS_IDENTITY_API_VERSION=3
 
 2) ./pkb.py --openstack_private_network='test-net' --openstack_public_network='Private-Network' ----openstack_network=test-net  --openstack_floating_ip_pool='Private-Network' --cloud=OpenStack --benchmarks=ping
 ```
+#Running speccpu2006
+```bash
 
+```
